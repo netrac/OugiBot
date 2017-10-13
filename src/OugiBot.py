@@ -63,7 +63,7 @@ def broadcast(bot, title, number):
 
 
 def update_feed(bot, job):
-    logger.info("UPDATE started")
+
     conn = sqlite3.connect("../rsc/db.db")
     conn.execute("PRAGMA foreign_keys = 1")
     episodes = parse()
@@ -82,7 +82,7 @@ def update_feed(bot, job):
         e_num = result[0][1]
         if (e_num < int(episode['episode_number'])):
             print("{} {}".format(e_num, int(episode['episode_number'])))
-            logger.info("NEW EPISODE {} {}".format(e_title, int(episode['episode_number'])))
+
             new_episodes += 1
             c.execute("Update series SET episodes = ? WHERE title = ?", [int(episode['episode_number']), e_title])
             broadcast(bot, e_title, int(episode['episode_number']))
@@ -90,7 +90,6 @@ def update_feed(bot, job):
         logger.info("Added {} new series".format(new_series))
     if new_episodes > 0:
         logger.info("Added {} new episodes".format(new_episodes))
-    logger.info("UPDATE finised")
     conn.commit()
 
 
@@ -110,6 +109,8 @@ def add_anime(bot, message, title):
     conn.execute("PRAGMA foreign_keys = 1")
     try:
         conn.execute("INSERT INTO watchlist(chatid,title) VALUES (?,?)", [str(message.chat_id), title])
+        logger.info("{} added {}".format(message.chat_id,title))
+
         bot.send_message(chat_id=message.chat_id, text="{} has been added successfully".format(title))
         conn.commit()
     except sqlite3.IntegrityError as e:
@@ -122,6 +123,8 @@ def rm_anime(bot, message, title):
 
     if conn.execute("DELETE FROM watchlist WHERE chatid = ? AND title = ?", [str(message.chat_id), title]).rowcount > 0:
         bot.send_message(chat_id=message.chat_id, text="{} has been removed successfully".format(title))
+        logger.info("{} removed {}".format(message.chat_id,title))
+
         conn.commit()
     else:
         bot.send_message(chat_id=message.chat_id, text="{} isn't on your list".format(title))
