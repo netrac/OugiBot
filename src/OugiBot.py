@@ -76,16 +76,16 @@ def update_feed(bot, job):
         if (len(result) == 0):
             new_series += 1
             c.execute("INSERT INTO series(title,episodes) VALUES (?,?)",
-                      [episode['anime_title'], episode['episode_number']])
+                      [episode['anime_title'], int(episode['episode_number'])])
             continue
         e_title = result[0][0]
         e_num = result[0][1]
         if (e_num < int(episode['episode_number'])):
             print("{} {}".format(e_num, int(episode['episode_number'])))
-            logger.info("NEW EPISODE {} {}".format(e_title, e_num))
+            logger.info("NEW EPISODE {} {}".format(e_title, int(episode['episode_number'])))
             new_episodes += 1
-            c.execute("Update series SET episodes = ? WHERE title = ?", [episode['episode_number'], e_title])
-            broadcast(bot, e_title, episode['episode_number'])
+            c.execute("Update series SET episodes = ? WHERE title = ?", [int(episode['episode_number']), e_title])
+            broadcast(bot, e_title, int(episode['episode_number']))
     if new_series > 0:
         logger.info("Added {} new series".format(new_series))
     if new_episodes > 0:
