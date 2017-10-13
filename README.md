@@ -1,5 +1,5 @@
 # OugiBot
-A pretty simple bot for Telegram that sends you a notification when a new episode from a seasonal anime series you follow is released. You can search for it on Telegram through the alias @OugiBot.
+A simple bot for Telegram that sends you a notification when a new episode from a seasonal anime series you follow is released. You can search for it on Telegram through the alias @OugiBot.
 
 ### Commands:
 - ```/add <name of the series>```: Looks for matches with the provided name and prompts you to add one from a list of four based on your search.
