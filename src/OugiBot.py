@@ -177,7 +177,6 @@ def remove(bot, update, args):
     conn = sqlite3.connect("../rsc/db.db")
     conn.execute("PRAGMA foreign_keys = 1")
     anime = ' '.join(args)
-    logger.info(msg="searching {}".format(anime))
     if (len(anime) == 0):
         bot.send_message(chat_id=update.message.chat_id, text="Usage: /remove <Name>")
         return
@@ -189,7 +188,6 @@ def remove(bot, update, args):
         l.append([a, fuzz.partial_ratio(a[0].lower(), anime.lower())])
     l.sort(key=lambda score: score[1], reverse=True)
     choices = l[:4]
-    logger.info(msg="comparing {} to {}".format(anime, choices[0][0][0]))
     if (choices[0][0][0] == anime):
         rm_anime(bot, update.message, anime)
         return
@@ -225,6 +223,9 @@ def list_series(bot, update):
     watchlist = ""
     for row in conn.execute("SELECT title FROM watchlist WHERE chatid = ? ORDER BY title", [update.message.chat_id]):
         watchlist += row[0] + '\n'
+    if len(watchlist) == 0:
+        update.message.reply_text("You are not being notified on any anime")
+        return
     update.message.reply_text(watchlist)
     return
 
@@ -237,7 +238,8 @@ def abort_button(bot, update):
 def error_handler(bot, update, error):
     try:
         raise error
-    except (BadRequest, Unauthorized):
+    except (BadRequest, Unauthorized) as e:
+        logger.waring(e)
         conn = sqlite3.connect("../rsc/db.db")
         conn.execute("PRAGMA foreign_keys = 1")
         conn.execute("DELETE FROM watchlist WHERE chatid = ?", [update.message.chat_id])
