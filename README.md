@@ -18,5 +18,5 @@ Hope you find it useful!
 <br/>
 <br/>
 <p align="center">
-<img src="https://i.imgur.com/TD0O72Q.gif">
+<img src="https://i.imgur.com/02es8QZ.gif">
 </p>
