@@ -84,8 +84,8 @@ def update_feed(bot, job):
             print("{} {}".format(e_num, int(episode['episode_number'])))
             logger.info("NEW EPISODE {} {}".format(e_title, e_num))
             new_episodes += 1
-            c.execute("Update series SET episodes = ? WHERE title = ?", [e_num, e_title])
-            broadcast(bot, e_title, e_num)
+            c.execute("Update series SET episodes = ? WHERE title = ?", [episode['episode_number'], e_title])
+            broadcast(bot, e_title, episode['episode_number'])
     if new_series > 0:
         logger.info("Added {} new series".format(new_series))
     if new_episodes > 0:
