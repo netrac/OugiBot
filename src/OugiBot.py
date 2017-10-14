@@ -97,9 +97,9 @@ def start(bot, update):
     text = """
     Hi! I'm a bot that lets you track your favorite seasonal anime. My job is to notify you when a new episode is released!
     <b>Commands:</b>
-    ``/add``    - Adds a new anime to your notifications
-    ``/list``   - Lists all the anime that you follow
-    ``/remove`` - Removes an anime from your notifications   
+    /add    - Adds a new anime to your notifications
+    /list   - Lists all the anime that you follow
+    /remove - Removes an anime from your notifications   
     """
     bot.send_message(chat_id=update.message.chat_id, text=text, parse_mode=ParseMode.HTML)
 
