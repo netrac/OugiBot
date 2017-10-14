@@ -59,7 +59,7 @@ def broadcast(bot, title, number):
             bot.send_message(chat_id=e.new_chat_id, text="{} {}".format(title, number))
         time.sleep(0.05)
     if num_users > 0:
-        logger.info("NEW EPISODE {} {} broadcasted to {} users".format(title, number, num_users))
+        logger.info("{} episode {} broadcasted to {} users".format(title, number, num_users))
 
 
 def update_feed(bot, job):
@@ -81,8 +81,6 @@ def update_feed(bot, job):
         e_title = result[0][0]
         e_num = result[0][1]
         if (e_num < int(episode['episode_number'])):
-            print("{} {}".format(e_num, int(episode['episode_number'])))
-
             new_episodes += 1
             c.execute("Update series SET episodes = ? WHERE title = ?", [int(episode['episode_number']), e_title])
             broadcast(bot, e_title, int(episode['episode_number']))
