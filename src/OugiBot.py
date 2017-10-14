@@ -63,7 +63,7 @@ def broadcast(bot, title, number):
 
 
 def update_feed(bot, job):
-    logger.info("UPDATE started")
+
     conn = sqlite3.connect("../rsc/db.db")
     conn.execute("PRAGMA foreign_keys = 1")
     episodes = parse()
@@ -76,21 +76,20 @@ def update_feed(bot, job):
         if (len(result) == 0):
             new_series += 1
             c.execute("INSERT INTO series(title,episodes) VALUES (?,?)",
-                      [episode['anime_title'], episode['episode_number']])
+                      [episode['anime_title'], int(episode['episode_number'])])
             continue
         e_title = result[0][0]
         e_num = result[0][1]
         if (e_num < int(episode['episode_number'])):
             print("{} {}".format(e_num, int(episode['episode_number'])))
-            logger.info("NEW EPISODE {} {}".format(e_title, e_num))
+
             new_episodes += 1
-            c.execute("Update series SET episodes = ? WHERE title = ?", [e_num, e_title])
-            broadcast(bot, e_title, e_num)
+            c.execute("Update series SET episodes = ? WHERE title = ?", [int(episode['episode_number']), e_title])
+            broadcast(bot, e_title, int(episode['episode_number']))
     if new_series > 0:
         logger.info("Added {} new series".format(new_series))
     if new_episodes > 0:
         logger.info("Added {} new episodes".format(new_episodes))
-    logger.info("UPDATE finised")
     conn.commit()
 
 
@@ -110,6 +109,8 @@ def add_anime(bot, message, title):
     conn.execute("PRAGMA foreign_keys = 1")
     try:
         conn.execute("INSERT INTO watchlist(chatid,title) VALUES (?,?)", [str(message.chat_id), title])
+        logger.info("{} added {}".format(message.chat_id,title))
+
         bot.send_message(chat_id=message.chat_id, text="{} has been added successfully".format(title))
         conn.commit()
     except sqlite3.IntegrityError as e:
@@ -122,6 +123,8 @@ def rm_anime(bot, message, title):
 
     if conn.execute("DELETE FROM watchlist WHERE chatid = ? AND title = ?", [str(message.chat_id), title]).rowcount > 0:
         bot.send_message(chat_id=message.chat_id, text="{} has been removed successfully".format(title))
+        logger.info("{} removed {}".format(message.chat_id,title))
+
         conn.commit()
     else:
         bot.send_message(chat_id=message.chat_id, text="{} isn't on your list".format(title))
@@ -177,7 +180,6 @@ def remove(bot, update, args):
     conn = sqlite3.connect("../rsc/db.db")
     conn.execute("PRAGMA foreign_keys = 1")
     anime = ' '.join(args)
-    logger.info(msg="searching {}".format(anime))
     if (len(anime) == 0):
         bot.send_message(chat_id=update.message.chat_id, text="Usage: /remove <Name>")
         return
@@ -189,7 +191,6 @@ def remove(bot, update, args):
         l.append([a, fuzz.partial_ratio(a[0].lower(), anime.lower())])
     l.sort(key=lambda score: score[1], reverse=True)
     choices = l[:4]
-    logger.info(msg="comparing {} to {}".format(anime, choices[0][0][0]))
     if (choices[0][0][0] == anime):
         rm_anime(bot, update.message, anime)
         return
@@ -225,6 +226,9 @@ def list_series(bot, update):
     watchlist = ""
     for row in conn.execute("SELECT title FROM watchlist WHERE chatid = ? ORDER BY title", [update.message.chat_id]):
         watchlist += row[0] + '\n'
+    if len(watchlist) == 0:
+        update.message.reply_text("You are not being notified on any anime")
+        return
     update.message.reply_text(watchlist)
     return
 
@@ -237,7 +241,8 @@ def abort_button(bot, update):
 def error_handler(bot, update, error):
     try:
         raise error
-    except (BadRequest, Unauthorized):
+    except (BadRequest, Unauthorized) as e:
+        logger.waring(e)
         conn = sqlite3.connect("../rsc/db.db")
         conn.execute("PRAGMA foreign_keys = 1")
         conn.execute("DELETE FROM watchlist WHERE chatid = ?", [update.message.chat_id])
