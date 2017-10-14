@@ -95,11 +95,11 @@ def update_feed(bot, job):
 
 def start(bot, update):
     text = """
-    Hi! I send notifications when new anime episodes are released.
-    <b>Commands</b>
-    /add    - Adds a new anime to your notifications
-    /list   - Lists all the anime that you follow
-    /remove - Removes an anime from your notifications   
+    Hi! I'm a bot that lets you track your favorite seasonal anime. My job is to notify you when a new episode is released!
+    <b>Commands:</b>
+    ``/add``    - Adds a new anime to your notifications
+    ``/list``   - Lists all the anime that you follow
+    ``/remove`` - Removes an anime from your notifications   
     """
     bot.send_message(chat_id=update.message.chat_id, text=text, parse_mode=ParseMode.HTML)
 
@@ -111,10 +111,10 @@ def add_anime(bot, message, title):
         conn.execute("INSERT INTO watchlist(chatid,title) VALUES (?,?)", [str(message.chat_id), title])
         logger.info("{} added {}".format(message.chat_id,title))
 
-        bot.send_message(chat_id=message.chat_id, text="{} has been added successfully".format(title))
+        bot.send_message(chat_id=message.chat_id, text="{} has been added successfully to your list.".format(title))
         conn.commit()
     except sqlite3.IntegrityError as e:
-        bot.send_message(chat_id=message.chat_id, text="{} is already on your list".format(title))
+        bot.send_message(chat_id=message.chat_id, text="{} is already on your list.".format(title))
 
 
 def rm_anime(bot, message, title):
@@ -122,12 +122,12 @@ def rm_anime(bot, message, title):
     conn.execute("PRAGMA foreign_keys = 1")
 
     if conn.execute("DELETE FROM watchlist WHERE chatid = ? AND title = ?", [str(message.chat_id), title]).rowcount > 0:
-        bot.send_message(chat_id=message.chat_id, text="{} has been removed successfully".format(title))
+        bot.send_message(chat_id=message.chat_id, text="{} has been removed successfully from your list.".format(title))
         logger.info("{} removed {}".format(message.chat_id,title))
 
         conn.commit()
     else:
-        bot.send_message(chat_id=message.chat_id, text="{} isn't on your list".format(title))
+        bot.send_message(chat_id=message.chat_id, text="You can't remove {} from your list because you're not tracking it yet!".format(title))
 
 
 def add(bot, update, args):
@@ -135,7 +135,7 @@ def add(bot, update, args):
     conn.execute("PRAGMA foreign_keys = 1")
     anime = ' '.join(args)
     if (len(anime) == 0):
-        bot.send_message(chat_id=update.message.chat_id, text="Usage: /add <Name>")
+        bot.send_message(chat_id=update.message.chat_id, text="Usage: /add <name of the series>")
         return
     c = conn.cursor()
 
@@ -155,7 +155,7 @@ def add(bot, update, args):
     for i in choices:
         keyboard.append(InlineKeyboardButton(text=i[0][0], callback_data="add#" + str(i[0][1])))
     if (len(keyboard) == 0):
-        bot.send_message(chat_id=update.message.chat_id, text="{} couldn't be found".format(anime))
+        bot.send_message(chat_id=update.message.chat_id, text="{} couldn't be found. Make sure it's a seasonal anime (i.e. not a previously broadcasted one).".format(anime))
         return
     keyboard.append((InlineKeyboardButton(text="<- Cancel", callback_data="abort")))
     reply_markup = InlineKeyboardMarkup(build_menu(keyboard, n_cols=1))
@@ -181,7 +181,7 @@ def remove(bot, update, args):
     conn.execute("PRAGMA foreign_keys = 1")
     anime = ' '.join(args)
     if (len(anime) == 0):
-        bot.send_message(chat_id=update.message.chat_id, text="Usage: /remove <Name>")
+        bot.send_message(chat_id=update.message.chat_id, text="Usage: /remove <name of the series>")
         return
     c = conn.cursor()
     c.execute("SELECT title, Rowid FROM series")
@@ -199,9 +199,9 @@ def remove(bot, update, args):
     for i in choices:
         keyboard.append(InlineKeyboardButton(text=i[0][0], callback_data="rm#" + str(i[0][1])))
     if (len(keyboard) == 0):
-        bot.send_message(chat_id=update.message.chat_id, text="{} couldn't be found".format(anime))
-        return
-    keyboard.append((InlineKeyboardButton(text="<- Cancel", callback_data="abort")))
+        bot.send_message(chat_id=update.message.chat_id, text="{} couldn't be found. Make sure it's a seasonal anime (i.e. not a previously broadcasted one).".format(anime))
+        RETURN150
+    KEYBOARD.append((InlineKeyboardButton(text="<- Cancel", callback_data="abort")))
     reply_markup = InlineKeyboardMarkup(build_menu(keyboard, n_cols=1))
     update.message.reply_text('Please choose:', reply_markup=reply_markup)
 
