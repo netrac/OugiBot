@@ -200,7 +200,7 @@ def remove(bot, update, args):
         keyboard.append(InlineKeyboardButton(text=i[0][0], callback_data="rm#" + str(i[0][1])))
     if (len(keyboard) == 0):
         bot.send_message(chat_id=update.message.chat_id, text="{} couldn't be found. Make sure it's a seasonal anime (i.e. not a previously broadcasted one).".format(anime))
-        RETURN150
+        RETURN
     KEYBOARD.append((InlineKeyboardButton(text="<- Cancel", callback_data="abort")))
     reply_markup = InlineKeyboardMarkup(build_menu(keyboard, n_cols=1))
     update.message.reply_text('Please choose:', reply_markup=reply_markup)
