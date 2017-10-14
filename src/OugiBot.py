@@ -49,7 +49,7 @@ def broadcast(bot, title, number):
     for user in users:
         num_users += 1;
         try:
-            bot.send_message(chat_id=user[0], text="{} {}".format(title, number))
+            bot.send_message(chat_id=user[0], text="Episode {} of {} has just been released!".format(number, title))
         except (BadRequest, Unauthorized):
             num_users -= 1
             conn.execute("DELETE FROM watchlist WHERE chatid = ?"[user[0]])
@@ -201,9 +201,9 @@ def remove(bot, update, args):
     if (len(keyboard) == 0):
         bot.send_message(chat_id=update.message.chat_id, text="{} couldn't be found. Make sure it's a seasonal anime (i.e. not a previously broadcasted one).".format(anime))
         RETURN
-    KEYBOARD.append((InlineKeyboardButton(text="<- Cancel", callback_data="abort")))
+    KEYBOARD.append((InlineKeyboardButton(text="\u2B05 Cancel search", callback_data="abort")))
     reply_markup = InlineKeyboardMarkup(build_menu(keyboard, n_cols=1))
-    update.message.reply_text('Please choose:', reply_markup=reply_markup)
+    update.message.reply_text('Please, choose a series from the following:', reply_markup=reply_markup)
 
 
 def remove_button(bot, update):
