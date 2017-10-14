@@ -157,7 +157,7 @@ def add(bot, update, args):
     if (len(keyboard) == 0):
         bot.send_message(chat_id=update.message.chat_id, text="{} couldn't be found. Make sure it's a seasonal anime (i.e. not a previously broadcasted one).".format(anime))
         return
-    keyboard.append((InlineKeyboardButton(text="<- Cancel", callback_data="abort")))
+    keyboard.append((InlineKeyboardButton(text="\u2B05 Cancel search", callback_data="abort")))
     reply_markup = InlineKeyboardMarkup(build_menu(keyboard, n_cols=1))
 
     update.message.reply_text('Please choose:', reply_markup=reply_markup)
