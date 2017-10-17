@@ -95,7 +95,7 @@ ENV/
 .ropeproject
 
 # extra
-rsc/db.db
+rsc/db.*
 rsc/feeds.txt
 secret.py
 # mypy
