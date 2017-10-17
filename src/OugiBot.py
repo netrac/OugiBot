@@ -50,13 +50,16 @@ def broadcast(bot, title, number):
         num_users += 1;
         try:
             bot.send_message(chat_id=user[0], text="Episode {} of {} has just been released!".format(number, title))
-        except (BadRequest, Unauthorized):
+        except Unauthorized:
             num_users -= 1
             conn.execute("DELETE FROM watchlist WHERE chatid = ?"[user[0]])
             logger.warning("User {} has been removed".format(user[0]))
         except ChatMigrated as e:
             conn.execute("UPDATE watchlist SET chatid = ? where chatid = ?", [e.new_chat_id, user[0]])
             bot.send_message(chat_id=e.new_chat_id, text="{} {}".format(title, number))
+        except Exception as e:
+            logger.warning("Error while broadcasting {} to {}:\n {}".format(bot,user[0],e))
+
         time.sleep(0.05)
     if num_users > 0:
         logger.info("{} episode {} broadcasted to {} users".format(title, number, num_users))
@@ -245,8 +248,8 @@ def error_handler(bot, update, error):
         conn.execute("PRAGMA foreign_keys = 1")
         conn.execute("DELETE FROM watchlist WHERE chatid = ?", [update.message.chat_id])
         logger.warning("User {} has been removed".format(update.message.chat_id))
-    except:
-        logger.warning('Update "%s" caused error "%s"' % (update, error))
+    except Exception as e:
+        logger.warning('Update "%s" caused error "%s"' % (update, e))
         # Create the Updater and pass it your bot's token.
 
 
