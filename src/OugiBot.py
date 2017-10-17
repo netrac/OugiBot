@@ -239,8 +239,8 @@ def abort_button(bot, update):
 def error_handler(bot, update, error):
     try:
         raise error
-    except (BadRequest, Unauthorized) as e:
-        logger.waring(e)
+    except  Unauthorized as e:
+        logger.warning(e)
         conn = sqlite3.connect("../rsc/db.db")
         conn.execute("PRAGMA foreign_keys = 1")
         conn.execute("DELETE FROM watchlist WHERE chatid = ?", [update.message.chat_id])
