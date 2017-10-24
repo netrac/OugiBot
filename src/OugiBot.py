@@ -12,7 +12,7 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
 from secret import TOKEN
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+logging.basicConfig(filename='../rsc/OugiBot.log',filemode='a',format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
