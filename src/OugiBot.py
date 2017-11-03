@@ -74,6 +74,8 @@ def update_feed(bot, job):
     new_series = 0
     for episode in episodes:
         c = conn.cursor()
+        if isinstance(episode['episode_number'],list):
+            episode['episode_number'] = episode['episode_number'][0]
         c.execute("Select * from series WHERE title= ?", [episode['anime_title']])
         result = c.fetchall()
         if (len(result) == 0):
