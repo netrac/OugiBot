@@ -6,6 +6,7 @@ cloud-init==0.7.9
 command-not-found==0.3
 configobj==5.0.6
 cryptography==1.2.3
+feedparser==5.2.1
 future==0.16.0
 fuzzywuzzy==0.15.1
 idna==2.0
